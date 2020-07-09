@@ -206,12 +206,6 @@
                                         <goal>prepare-agent</goal>
                                     </goals>
                                 </execution>
-                                <execution>
-                                    <id>prepare-integration-test-agent</id>
-                                    <goals>
-                                        <goal>prepare-agent-integration</goal>
-                                    </goals>
-                                </execution>
                             </executions>
                         </plugin>
                     </plugins>
