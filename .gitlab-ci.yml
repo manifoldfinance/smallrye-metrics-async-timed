@@ -36,8 +36,8 @@ maven_deploy:
   before_script:
     - .mvn/mvn-entrypoint.sh
   script:
-    - mvn deploy ${MAVEN_CLI_OPTS} -Pjacoco -Dmymavenrepo.read.url=${MYMAVENREPO_READ_URL} -Dmymavenrepo.write.url=${MYMAVENREPO_WRTITE_URL}
-    - mvn sonar:sonar ${MAVEN_CLI_OPTS} -Psonar -Dsonar.host.url=${SONAR_URL} -Dsonar.login=${SONAR_LOGIN}
+    - mvn deploy ${MAVEN_CLI_OPTS} -Pjacoco
+    - mvn sonar:sonar ${MAVEN_CLI_OPTS} -Psonar
     - cat target/site/jacoco/index.html | grep -o 'Total</td><td[^>]*>[^<]*</td><td[^>]*>\([0-9]\{1,3\}\)%'
   coverage: '/^Total.*>([0-9]{1,3})\s*%$/'
   cache:
@@ -55,8 +55,8 @@ maven_release:
   before_script:
     - .mvn/mvn-entrypoint.sh
   script:
-    - mvn deploy ${MAVEN_CLI_OPTS} -Pjacoco,release -Dmymavenrepo.read.url=${MYMAVENREPO_READ_URL} -Dmymavenrepo.write.url=${MYMAVENREPO_WRTITE_URL}
-    - mvn sonar:sonar ${MAVEN_CLI_OPTS} -Psonar -Dsonar.host.url=${SONAR_URL} -Dsonar.login=${SONAR_LOGIN}
+    - mvn deploy ${MAVEN_CLI_OPTS} -Pjacoco,release
+    - mvn sonar:sonar ${MAVEN_CLI_OPTS} -Psonar
     - cat target/site/jacoco/index.html | grep -o 'Total</td><td[^>]*>[^<]*</td><td[^>]*>\([0-9]\{1,3\}\)%'
   coverage: '/^Total.*>([0-9]{1,3})\s*%$/'
   cache:
