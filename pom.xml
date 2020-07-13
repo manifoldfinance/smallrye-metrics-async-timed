@@ -6,7 +6,7 @@
 
     <groupId>com.traum</groupId>
     <artifactId>smallrye-metrics-async-timed</artifactId>
-    <version>0.5.0</version>
+    <version>0.5.1</version>
 
     <scm>
         <connection>scm:git:git@gitlab.tfw.io:tfw-packages/smallrye-metrics-async-timed.git</connection>
