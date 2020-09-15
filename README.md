@@ -3,21 +3,41 @@
 This library provides annotation-based timing for methods returning promised values, namely
 `java.util.concurrent.CompletionStage` and `io.smallrye.mutiny.Uni`.
 
+## Installation
+
+Please add our bintray repository:
+
+```xml
+<repositories>
+    <repository>
+        <id>bintray</id>
+        <name>JFrog Bintray Apache Maven Packages</name>
+        <url>https://dl.bintray.com/traum-ferienwohnungen/maven</url>
+    </repository>
+</repositories>
+```
+
+This library assumes [`io.smallrye:smallrye-metrics`](https://smallrye.io/docs/smallrye-metrics/2.4.0/index.html) is available at runtime.
+Therefore, the minimum set of dependencies looks as follows:
+
+```xml
+<dependencies>
+    <!-- When from quarkus use io.quarkus:quarkus-smallrye-metrics instead -->
+    <dependency>
+        <groupId>io.smallrye</groupId>
+        <artifactId>smallrye-metrics</artifactId>
+        <version>2.4.x</version>
+        <scope>provided</scope>
+    </dependency>
+    <dependency>
+        <groupId>com.traum</groupId>
+        <artifactId>smallrye-metrics-async-timed</artifactId>
+        <version>RELEASE</version>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+```
+
 ## Usage
 
 Annotate any bean method returning one of the aforementioned types with `com.traum.microprofile.metrics.annotation.AsyncTimed`.
-
-## Release
-
-```shell
-mvn versions:set $MAVEN_CLI_OPTS -DnewVersion=$MAVEN_RELEASE_VERSION
-git ls-files . | grep 'pom\.xml$' | xargs git add
-git commit -m "[release] set version to $MAVEN_RELEASE_VERSION"
-git tag "v$MAVEN_RELEASE_VERSION" -m "[release] v$MAVEN_RELEASE_VERSION"
-mvn deploy ${MAVEN_CLI_OPTS} -Pjacoco -Dmymavenrepo.read.url=${MYMAVENREPO_READ_URL} -Dmymavenrepo.write.url=${MYMAVENREPO_WRTITE_URL}
-mvn versions:commit $MAVEN_CLI_OPTS
-mvn versions:set $MAVEN_CLI_OPTS -DnextSnapshot=true
-git ls-files . | grep 'pom\.xml$' | xargs git add
-git commit -m "[release] prepared next version"
-```
-
