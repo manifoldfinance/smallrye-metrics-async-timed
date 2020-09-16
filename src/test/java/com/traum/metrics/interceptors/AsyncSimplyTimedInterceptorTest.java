@@ -19,15 +19,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(WeldJunit5Extension.class)
-class AsyncTimedInterceptorTest {
+class AsyncSimplyTimedInterceptorTest {
 
   @WeldSetup
   WeldInitiator initiator =
       WeldInitiator.of(
           WeldInitiator.createWeld()
               .beanClasses(AsyncService.class, MetricRegistryProducer.class)
-              .packages(AsyncTimedInterceptor.class)
-              .interceptors(AsyncTimedInterceptor.class));
+              .packages(AsyncSimplyTimedInterceptor.class)
+              .interceptors(AsyncSimplyTimedInterceptor.class));
 
   @Inject AsyncService service;
 

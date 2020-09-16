@@ -1,6 +1,6 @@
 package com.traum.metrics.interceptors;
 
-import com.traum.microprofile.metrics.annotation.AsyncTimed;
+import com.traum.microprofile.metrics.annotation.AsyncSimplyTimed;
 import io.smallrye.metrics.TagsUtils;
 import io.smallrye.metrics.elementdesc.AnnotationInfo;
 import io.smallrye.metrics.elementdesc.MemberInfo;
@@ -27,16 +27,16 @@ import org.eclipse.microprofile.metrics.SimpleTimer.Context;
 import org.eclipse.microprofile.metrics.Tag;
 
 @Dependent
-@AsyncTimed
 @Interceptor
-public class AsyncTimedInterceptor {
+@AsyncSimplyTimed
+public class AsyncSimplyTimedInterceptor {
 
   private final MetricRegistry registry;
 
   private final Map<String, SimpleTimer> cache = new HashMap<>();
 
   @Inject
-  AsyncTimedInterceptor(MetricRegistry registry) {
+  AsyncSimplyTimedInterceptor(MetricRegistry registry) {
     this.registry = registry;
   }
 
@@ -81,7 +81,7 @@ public class AsyncTimedInterceptor {
     return cache.computeIfAbsent(
         element.getName(),
         key -> {
-          Of<AsyncTimed> resolvedAnnotation = AsyncTimedOf.of(element);
+          Of<AsyncSimplyTimed> resolvedAnnotation = AsyncSimplyTimedOf.of(element);
 
           final Metadata metadata =
               Metadata.builder()
@@ -98,7 +98,7 @@ public class AsyncTimedInterceptor {
   }
 }
 
-class AsyncTimedOf implements Of<AsyncTimed> {
+class AsyncSimplyTimedOf implements Of<AsyncSimplyTimed> {
 
   private static final MemberInfoAdapter<Member> MEMBER_INFO_ADAPTER = new CDIMemberInfoAdapter();
 
@@ -106,24 +106,24 @@ class AsyncTimedOf implements Of<AsyncTimed> {
   private final String metricName;
   private final Tag[] tags;
 
-  private AsyncTimedOf(AnnotationInfo annotationInfo, String metricName, Tag[] tags) {
+  private AsyncSimplyTimedOf(AnnotationInfo annotationInfo, String metricName, Tag[] tags) {
     this.annotationInfo = annotationInfo;
     this.metricName = metricName;
     this.tags = tags;
   }
 
-  static <E extends Member & AnnotatedElement> AsyncTimedOf of(E element) {
-    final AsyncTimed annotation = element.getAnnotation(AsyncTimed.class);
+  static <E extends Member & AnnotatedElement> AsyncSimplyTimedOf of(E element) {
+    final AsyncSimplyTimed annotation = element.getAnnotation(AsyncSimplyTimed.class);
     final MemberInfo memberInfo = MEMBER_INFO_ADAPTER.convert(element);
     final String name = annotation.name().isEmpty() ? memberInfo.getName() : annotation.name();
     final String metricName =
         annotation.absolute()
             ? name
             : MetricRegistry.name(memberInfo.getDeclaringClassName(), name);
-    final AnnotationInfo annotationInfo = new AsyncTimedAnnotationInfo(annotation);
+    final AnnotationInfo annotationInfo = new AsyncSimplyTimedAnnotationInfo(annotation);
     final Tag[] tags = TagsUtils.parseTagsAsArray(annotation.tags());
 
-    return new AsyncTimedOf(annotationInfo, metricName, tags);
+    return new AsyncSimplyTimedOf(annotationInfo, metricName, tags);
   }
 
   @Override
@@ -147,11 +147,11 @@ class AsyncTimedOf implements Of<AsyncTimed> {
   }
 }
 
-class AsyncTimedAnnotationInfo implements AnnotationInfo {
+class AsyncSimplyTimedAnnotationInfo implements AnnotationInfo {
 
-  private final AsyncTimed instance;
+  private final AsyncSimplyTimed instance;
 
-  public <T extends Annotation> AsyncTimedAnnotationInfo(AsyncTimed instance) {
+  public <T extends Annotation> AsyncSimplyTimedAnnotationInfo(AsyncSimplyTimed instance) {
     this.instance = instance;
   }
 

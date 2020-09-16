@@ -24,7 +24,7 @@ import org.eclipse.microprofile.metrics.MetricUnits;
   ElementType.METHOD,
   ElementType.ANNOTATION_TYPE
 })
-public @interface AsyncTimed {
+public @interface AsyncSimplyTimed {
 
   /** @return The name of the simple timer. */
   @Nonbinding

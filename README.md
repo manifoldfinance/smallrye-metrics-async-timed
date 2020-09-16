@@ -1,4 +1,4 @@
-# SmallRye Metrics Extension: AsyncTimed
+# SmallRye Metrics Extension: AsyncSimplyTimed
 
 This library provides annotation-based timing for methods returning promised values, namely
 `java.util.concurrent.CompletionStage` and `io.smallrye.mutiny.Uni`.
@@ -40,4 +40,5 @@ Therefore, the minimum set of dependencies looks as follows:
 
 ## Usage
 
-Annotate any bean method returning one of the aforementioned types with `com.traum.microprofile.metrics.annotation.AsyncTimed`.
+Annotate any bean method returning one of the aforementioned types with `com.traum.microprofile.metrics.annotation.AsyncSimplyTimed`,
+instead of MicroProfile's [`SimplyTimed`](https://download.eclipse.org/microprofile/microprofile-metrics-2.3/microprofile-metrics-spec-2.3.html#_simplytimed).
