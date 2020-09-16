@@ -20,7 +20,6 @@ import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 import org.eclipse.microprofile.metrics.Metadata;
-import org.eclipse.microprofile.metrics.MetricID;
 import org.eclipse.microprofile.metrics.MetricRegistry;
 import org.eclipse.microprofile.metrics.MetricType;
 import org.eclipse.microprofile.metrics.SimpleTimer;
@@ -34,6 +33,8 @@ public class AsyncTimedInterceptor {
 
   private final MetricRegistry registry;
 
+  private final Map<String, SimpleTimer> cache = new HashMap<>();
+
   @Inject
   AsyncTimedInterceptor(MetricRegistry registry) {
     this.registry = registry;
@@ -41,71 +42,59 @@ public class AsyncTimedInterceptor {
 
   @AroundInvoke
   Object meteredMethod(InvocationContext context) throws Exception {
-    return this.timedCallable(context, context.getMethod());
+    return this.meterTime(context, context.getMethod());
   }
 
-  private Map<String, MetricID> cache = new HashMap<>();
-
-  private <E extends Member & AnnotatedElement> Object timedCallable(
+  private <E extends Member & AnnotatedElement> Object meterTime(
       InvocationContext context, E element) throws Exception {
 
-    final MetricID metricID =
-        cache.computeIfAbsent(
-            element.getName(),
-            key -> {
-              Of<AsyncTimed> resolvedAnnotation = AsyncTimedOf.of(element);
+    final SimpleTimer timer = registerTimer(element);
 
-              final Metadata metadata =
-                  Metadata.builder()
-                      .withType(MetricType.SIMPLE_TIMER)
-                      .withName(resolvedAnnotation.metricName())
-                      .reusable(resolvedAnnotation.metricAnnotation().reusable())
-                      .withOptionalDisplayName(resolvedAnnotation.metricAnnotation().displayName())
-                      .withOptionalDescription(resolvedAnnotation.metricAnnotation().description())
-                      .withOptionalUnit(resolvedAnnotation.metricAnnotation().unit())
-                      .build();
-
-              registry.simpleTimer(metadata, resolvedAnnotation.tags());
-
-              return new MetricID(metadata.getName(), resolvedAnnotation.tags());
-            });
-
-    final SimpleTimer timer = (SimpleTimer) registry.getMetrics().get(metricID);
-
-    if (timer == null) {
-      throw new IllegalStateException(
-          "No simple timer with metricID ["
-              + metricID
-              + "] found in registry ["
-              + this.registry
-              + "]");
-    } else {
-      Context time = timer.time();
-      try {
-        if (context.getMethod().getReturnType().isAssignableFrom(CompletionStage.class)) {
-          return ((CompletionStage) context.proceed())
-              .whenComplete(
-                  (result, error) -> {
-                    time.stop();
-                  });
-        }
-        if (context.getMethod().getReturnType().isAssignableFrom(Uni.class)) {
-          return ((Uni) context.proceed())
-              .onItem()
-              .invoke(result -> time.stop())
-              .onFailure()
-              .invoke(error -> time.stop());
-        }
-        throw new IllegalArgumentException(
-            "Unsupported return type "
-                + context.getMethod().getReturnType()
-                + " from "
-                + context.getMethod());
-      } catch (Throwable t) {
-        time.stop();
-        throw t;
+    Context time = timer.time();
+    try {
+      if (context.getMethod().getReturnType().isAssignableFrom(CompletionStage.class)) {
+        return ((CompletionStage) context.proceed())
+            .whenComplete(
+                (result, error) -> {
+                  time.stop();
+                });
       }
+      if (context.getMethod().getReturnType().isAssignableFrom(Uni.class)) {
+        return ((Uni) context.proceed())
+            .onItem()
+            .invoke(result -> time.stop())
+            .onFailure()
+            .invoke(error -> time.stop());
+      }
+      throw new IllegalArgumentException(
+          "Unsupported return type "
+              + context.getMethod().getReturnType()
+              + " from "
+              + context.getMethod());
+    } catch (Throwable t) {
+      time.stop();
+      throw t;
     }
+  }
+
+  private <E extends Member & AnnotatedElement> SimpleTimer registerTimer(E element) {
+    return cache.computeIfAbsent(
+        element.getName(),
+        key -> {
+          Of<AsyncTimed> resolvedAnnotation = AsyncTimedOf.of(element);
+
+          final Metadata metadata =
+              Metadata.builder()
+                  .withType(MetricType.SIMPLE_TIMER)
+                  .withName(resolvedAnnotation.metricName())
+                  .reusable(resolvedAnnotation.metricAnnotation().reusable())
+                  .withOptionalDisplayName(resolvedAnnotation.metricAnnotation().displayName())
+                  .withOptionalDescription(resolvedAnnotation.metricAnnotation().description())
+                  .withOptionalUnit(resolvedAnnotation.metricAnnotation().unit())
+                  .build();
+
+          return registry.simpleTimer(metadata, resolvedAnnotation.tags());
+        });
   }
 }
 
