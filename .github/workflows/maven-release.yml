@@ -32,10 +32,10 @@ jobs:
       env:
         GITHUB_ACTOR: ${{ github.actor }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GPG_PASSPHRASE: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
-        GPG_KEYNAME: ${{ secrets.GPG_PRIVATE_KEY_NAME }}
+        GPG_PASSPHRASE: ${{ secrets.SIGNING_GPG_PRIVATE_KEY_PASSPHRASE }}
+        GPG_KEYNAME: ${{ secrets.SIGNING_GPG_PRIVATE_KEY_NAME }}
       run: |
-        echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --no-tty --import
+        echo "${{ secrets.SIGNING_GPG_PRIVATE_KEY }}" | gpg --batch --no-tty --import
         sed -i 's@<password>__GITHUB_TOKEN__.*$@<password>${{ secrets.GITHUB_TOKEN }}</password>@g' ${{ github.workspace }}/.mvn/settings.xml
         mvn deploy --settings ${{ github.workspace }}/.mvn/settings.xml --batch-mode --no-transfer-progress -Prelease,gpg,github -Dmaven.wagon.http.pool=false
         echo "##[set-output name=tag;]$(echo ${{ github.ref }} | sed 's@refs/tags/@@g')"
