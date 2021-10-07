@@ -8,23 +8,20 @@ import io.smallrye.metrics.elementdesc.adapter.MemberInfoAdapter;
 import io.smallrye.metrics.elementdesc.adapter.cdi.CDIMemberInfoAdapter;
 import io.smallrye.metrics.interceptors.MetricResolver.Of;
 import io.smallrye.mutiny.Uni;
+import org.eclipse.microprofile.metrics.*;
+import org.eclipse.microprofile.metrics.SimpleTimer.Context;
+
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
+import javax.interceptor.AroundInvoke;
+import javax.interceptor.Interceptor;
+import javax.interceptor.InvocationContext;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletionStage;
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
-import javax.interceptor.AroundInvoke;
-import javax.interceptor.Interceptor;
-import javax.interceptor.InvocationContext;
-import org.eclipse.microprofile.metrics.Metadata;
-import org.eclipse.microprofile.metrics.MetricRegistry;
-import org.eclipse.microprofile.metrics.MetricType;
-import org.eclipse.microprofile.metrics.SimpleTimer;
-import org.eclipse.microprofile.metrics.SimpleTimer.Context;
-import org.eclipse.microprofile.metrics.Tag;
 
 @Dependent
 @Interceptor
@@ -87,10 +84,9 @@ public class AsyncSimplyTimedInterceptor {
               Metadata.builder()
                   .withType(MetricType.SIMPLE_TIMER)
                   .withName(resolvedAnnotation.metricName())
-                  .reusable(resolvedAnnotation.metricAnnotation().reusable())
-                  .withOptionalDisplayName(resolvedAnnotation.metricAnnotation().displayName())
-                  .withOptionalDescription(resolvedAnnotation.metricAnnotation().description())
-                  .withOptionalUnit(resolvedAnnotation.metricAnnotation().unit())
+                  .withDisplayName(resolvedAnnotation.metricAnnotation().displayName())
+                  .withDescription(resolvedAnnotation.metricAnnotation().description())
+                  .withUnit(resolvedAnnotation.metricAnnotation().unit())
                   .build();
 
           return registry.simpleTimer(metadata, resolvedAnnotation.tags());
@@ -183,11 +179,6 @@ class AsyncSimplyTimedAnnotationInfo implements AnnotationInfo {
   @Override
   public String unit() {
     return instance.unit();
-  }
-
-  @Override
-  public boolean reusable() {
-    return instance.reusable();
   }
 
   @Override

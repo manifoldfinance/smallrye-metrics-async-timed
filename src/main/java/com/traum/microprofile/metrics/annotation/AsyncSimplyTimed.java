@@ -67,12 +67,4 @@ public @interface AsyncSimplyTimed {
    */
   @Nonbinding
   String unit() default MetricUnits.NANOSECONDS;
-
-  /**
-   * Denotes if this metric instance can be reused by multiple registrations.
-   *
-   * @return false if not reusable, true otherwise
-   */
-  @Nonbinding
-  boolean reusable() default false;
 }
