@@ -1,36 +1,35 @@
 package com.traum.metrics.interceptors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.time.Duration;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.concurrent.CompletionStage;
-import javax.inject.Inject;
 import org.awaitility.Awaitility;
 import org.eclipse.microprofile.metrics.MetricRegistry;
-import org.eclipse.microprofile.metrics.SimpleTimer;
+import org.eclipse.microprofile.metrics.Timer;
 import org.jboss.weld.junit5.WeldInitiator;
 import org.jboss.weld.junit5.WeldJunit5Extension;
 import org.jboss.weld.junit5.WeldSetup;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import javax.inject.Inject;
+import java.time.Duration;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.concurrent.CompletionStage;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 @ExtendWith(WeldJunit5Extension.class)
-class AsyncSimplyTimedInterceptorTest {
+class AsyncTimedInterceptorTest {
 
   @WeldSetup
   WeldInitiator initiator =
       WeldInitiator.of(
           WeldInitiator.createWeld()
-              .beanClasses(AsyncSimplyService.class, MetricRegistryProducer.class)
-              .packages(AsyncSimplyTimedInterceptor.class)
-              .interceptors(AsyncSimplyTimedInterceptor.class));
+              .beanClasses(AsyncService.class, MetricRegistryProducer.class)
+              .packages(AsyncTimedInterceptor.class)
+              .interceptors(AsyncTimedInterceptor.class));
 
   @Inject
-  AsyncSimplyService service;
+  AsyncService service;
 
   @Inject MetricRegistry metricRegistry;
 
@@ -44,7 +43,7 @@ class AsyncSimplyTimedInterceptorTest {
         .untilAsserted(
             () -> {
               final String metricName =
-                  AsyncSimplyService.class.getCanonicalName() + ".returnCompletionStage";
+                  AsyncService.class.getCanonicalName() + ".returnCompletionStage";
               assertTimer(metricName, delay.toMillis(), 1);
             });
   }
@@ -58,7 +57,7 @@ class AsyncSimplyTimedInterceptorTest {
         .atMost(Duration.ofSeconds(3))
         .untilAsserted(
             () -> {
-              final String metricName = AsyncSimplyService.class.getCanonicalName() + ".relative_name";
+              final String metricName = AsyncService.class.getCanonicalName() + ".relative_name";
               assertTimer(metricName, delay.toMillis(), 1);
             });
   }
@@ -109,19 +108,19 @@ class AsyncSimplyTimedInterceptorTest {
   }
 
   private void assertTimer(String metricName, long delayInMillis, int count) {
-    final Optional<SimpleTimer> timer = getSimpleTimer(metricName);
+    final Optional<Timer> timer = getTimer(metricName);
     assertTrue(timer.isPresent(), "Missing timer " + metricName);
     assertTimer(delayInMillis, timer.get(), count);
   }
 
-  private void assertTimer(long delayInMillis, SimpleTimer timer, int count) {
+  private void assertTimer(long delayInMillis, Timer timer, int count) {
     assertEquals(count, timer.getCount(), "Unexpected count");
     assertEquals(delayInMillis, timer.getElapsedTime().toMillis(), 10, "Unexpected measured time");
   }
 
-  private Optional<SimpleTimer> getSimpleTimer(String name) {
+  private Optional<Timer> getTimer(String name) {
     return metricRegistry
-        .getSimpleTimers()
+        .getTimers()
         .entrySet()
         .stream()
         .filter(entry -> entry.getKey().getName().equals(name))

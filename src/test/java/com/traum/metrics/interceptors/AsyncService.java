@@ -1,40 +1,37 @@
 package com.traum.metrics.interceptors;
 
-import com.traum.microprofile.metrics.annotation.AsyncSimplyTimed;
-import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import com.traum.microprofile.metrics.annotation.AsyncTimed;
+
 import javax.enterprise.context.ApplicationScoped;
+import java.time.Duration;
+import java.util.concurrent.*;
 
 @ApplicationScoped
 public class AsyncService {
 
   ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
 
-  @AsyncSimplyTimed
+  @AsyncTimed
   public CompletionStage<Duration> returnCompletionStage(Duration delay) {
     return execute(delay);
   }
 
-  @AsyncSimplyTimed(name = "relative_name")
+  @AsyncTimed(name = "relative_name")
   public CompletionStage<Duration> returnCompletionStageWithRelativeName(Duration delay) {
     return execute(delay);
   }
 
-  @AsyncSimplyTimed(name = "absolute_name", absolute = true)
+  @AsyncTimed(name = "absolute_name", absolute = true)
   public CompletionStage<Duration> returnCompletionStageWithAbsoluteName(Duration delay) {
     return execute(delay);
   }
 
-  @AsyncSimplyTimed(name = "with_exception", absolute = true)
+  @AsyncTimed(name = "with_exception", absolute = true)
   public CompletionStage<Duration> returnCompletionStageWithException(Duration delay) {
     throw new RuntimeException("Failed fast");
   }
 
-  @AsyncSimplyTimed(name = "with_failure", absolute = true)
+  @AsyncTimed(name = "with_failure", absolute = true)
   public CompletionStage<Duration> returnCompletionStageWithFailure(Duration delay) {
     return CompletableFuture.failedStage(new RuntimeException("Failed later"));
   }
