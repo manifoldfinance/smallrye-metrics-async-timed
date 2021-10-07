@@ -3,13 +3,8 @@
     <servers>
         <server>
             <id>github</id>
-            <username>schulzp</username>
+            <username>manifoldfinance</username>
             <password>__GITHUB_TOKEN__</password>
-        </server>
-        <server>
-            <id>bintray</id>
-            <username>schulzp</username>
-            <password>__BINTRAY_TOKEN__</password>
         </server>
     </servers>
     <profiles>
@@ -26,32 +21,13 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <altDeploymentRepository>github::https://maven.pkg.github.com/traum-ferienwohnungen/smallrye-metrics-async-timed</altDeploymentRepository>
+                <altDeploymentRepository>github::https://maven.pkg.github.com/manifoldfinance/smallrye-metrics-async-timed</altDeploymentRepository>
             </properties>
             <repositories>
                 <repository>
                     <id>github</id>
                     <name>GitHub Apache Maven Packages</name>
-                    <url>https://maven.pkg.github.com/traum-ferienwohnungen/smallrye-metrics-async-timed</url>
-                    <snapshots>
-                        <enabled>true</enabled>
-                    </snapshots>
-                    <releases>
-                        <enabled>true</enabled>
-                    </releases>
-                </repository>
-            </repositories>
-        </profile>
-        <profile>
-            <id>bintray</id>
-            <properties>
-                <altDeploymentRepository>bintray::https://api.bintray.com/maven/traum-ferienwohnungen/maven/smallrye-metrics-async-timed/;publish=1</altDeploymentRepository>
-            </properties>
-            <repositories>
-                <repository>
-                    <id>bintray</id>
-                    <name>JFrog Bintray Apache Maven Packages</name>
-                    <url>https://dl.bintray.com/traum-ferienwohnungen/maven</url>
+                    <url>https://maven.pkg.github.com/manifoldfinance/smallrye-metrics-async-timed</url>
                     <snapshots>
                         <enabled>true</enabled>
                     </snapshots>
